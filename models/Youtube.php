@@ -2,7 +2,7 @@
 class Youtube {
 
 	public $videos = [];
-	public $playlistId;
+	public $playlist = [];
 
 	function videosByPlaylistId($data, $part, $params) {
 		$params = array_filter($params);
@@ -12,7 +12,13 @@ class Youtube {
 	    );
 
 	    foreach ($response['items'] as $video) {
-	    	array_push($this->videos, $video['contentDetails']['videoId']);
+	    	array_push($this->videos, array(
+	    		'videoId' => $video['contentDetails']['videoId'],
+	    		'title' => $video['snippet']['title'],
+	    		'description' => $video['snippet']['description'],
+	    		'channelTitle' => $video['snippet']['channelTitle']
+	    		)
+	    	);
 	    }
 
 	    return $this->videos;
@@ -26,9 +32,14 @@ class Youtube {
 	        $params
 	    );
 
-	    $this->playlistId = $response['items'][0]['contentDetails']['relatedPlaylists']['uploads'];
+	    array_push($this->playlist, array(
+	    	'id' => $response['items'][0]['contentDetails']['relatedPlaylists']['uploads'],
+	    	'title' => $response['items'][0]['snippet']['title'],
+	    	'description' => $response['items'][0]['snippet']['description']
+	    	)
+		);
 
-	    return $this->playlistId;
+	    return $this->playlist[0];
 
 	}
 }
