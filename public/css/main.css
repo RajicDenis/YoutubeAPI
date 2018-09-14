@@ -79,7 +79,7 @@ input:focus{
 	transition: all 0.3s ease-in-out;
 }
 .thumb-box:hover {
-	transform: scale(1.05);
+	transform: scale(1.03);
 }
 .select {
 	border: 1px solid white ;

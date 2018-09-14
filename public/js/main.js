@@ -29,6 +29,11 @@ $.getJSON('public/videoData.json', function(json) {
 	}
 });
 
+window.onload = function() {
+	$('#vid_'+$videos[0].videoId).addClass('select');
+};
+
+
 
 $('.vid').on('click', function() {
 
