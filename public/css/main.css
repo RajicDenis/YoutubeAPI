@@ -2,21 +2,74 @@ body {
 	background: #060E15;
 	color: white;
 	font-family: 'Lato', sans-serif;
+	padding-bottom: 100px;
 }
 p {
     font-size: 13px;	
 }
+a {
+	color: white !important;
+}
 hr {
 	background: rgba(255,255,255,0.2);
+}
+input:focus{
+    outline: none;
+}
+
+.col-5>p {
+	margin:0;
 }
 
 .dark {
 	background: #212F3C;
+}
+.fs19 {
+	font-size: 19px;
+}
+
+.hide {
+	overflow-y: hidden;
+    max-height: 150px;
+}
+.show {
+	overflow-y: none;
+    max-height: 700px;
+}
+
+#srchChannel {
+	background: transparent;
+	height: 50px;
+    width: 300px;
+	border: none;
+	color: white;
+	font-family: 'Lato', sans-serif;
+	font-size: 20px;
+	font-weight: 600;
+	border-bottom: 2px solid rgba(255,255,255,0.6);
+	text-align: center;
+}
+#srchChannel::placeholder {
+	color: darkgray;
+	font-family: 'Lato', sans-serif;
+	text-align: center;
 }
 
 .video-desc {
 	font-family: 'Mukta', sans-serif;
 	font-size: 15px;
 	text-align: justify;
+	transition: max-height 0.3s ease-in-out;
+}
+.show-more {
+	cursor: pointer;
+}
+
+.empty-img {
+    width: 45%;
+    height: auto;
+}
+.empty-msg {
+	font-family: 'Cantarell', sans-serif;
 }
 
