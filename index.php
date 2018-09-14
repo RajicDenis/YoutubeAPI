@@ -38,6 +38,8 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
 		} else {
 			$videos = $youtube->videosByPlaylistId($data, 'snippet,contentDetails', array('playlistId' => $playlist['id'], 'maxResults' => 5));
 		}
+
+		file_put_contents('public/videoData.json', json_encode($videos));
 	} else {
 		// If there is no channel by the entered name, return empty array for videos
 		$videos = [];
@@ -67,6 +69,8 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
 	<link href="https://fonts.googleapis.com/css?family=Cantarell:400i" rel="stylesheet">
 
 	<link rel="stylesheet" type="text/css" href="public/css/main.css">
+
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 </head>
 	<body>
 		
@@ -91,8 +95,9 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
 
 			<div class="row">
 				<div class="col-7">
-					<iframe style="width: 100%; min-height: 400px;" src="https://www.youtube.com/embed/<?php echo $videos['videos'][0]['videoId'] ?>" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-					<span class="fs19 mt-3"><?php echo $videos['videos'][0]['title']; ?></span>
+					<div class="d-none"><?php $videos['videos'][0]; ?></div>
+					<iframe class="video-iframe" style="width: 100%; min-height: 400px;" src="https://www.youtube.com/embed/<?php echo $videos['videos'][0]['videoId'] ?>" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+					<span class="fs19 mt-3 video-title"><?php echo $videos['videos'][0]['title']; ?></span>
 					<hr>
 					<p class="text-muted video-desc hide" id="videoDesc"><?php echo nl2br($videos['videos'][0]['description']); ?></p>
 					<hr>
@@ -104,7 +109,7 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
 				<div class="col-5">
 					<div class="container">
 					<?php foreach($videos['videos'] as $video): ?>
-					<div class="row mb-4">
+					<div class="row mb-4 thumb-box vid" id="vid_<?php echo $video['videoId']; ?>" data-video-id="<?php echo $video['videoId']; ?>">
 						<div class="col-7">
 							<img style="width: 100%; height: auto;" src="<?php echo $video['thumbnail'] ?>">
 						</div>

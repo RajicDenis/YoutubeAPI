@@ -73,3 +73,14 @@ input:focus{
 	font-family: 'Cantarell', sans-serif;
 }
 
+.thumb-box {
+	padding: 10px 0;
+	cursor: pointer;
+	transition: all 0.3s ease-in-out;
+}
+.thumb-box:hover {
+	transform: scale(1.05);
+}
+.select {
+	border: 1px solid white ;
+}

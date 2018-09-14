@@ -20,3 +20,34 @@ showMore.addEventListener('click', function() {
 		
 	}
 });
+
+$videos = [];
+$.getJSON('public/videoData.json', function(json) {
+	for($i=0; $i<json.videos.length; $i++) {
+
+		$videos.push(json.videos[$i]);
+	}
+});
+
+
+$('.vid').on('click', function() {
+
+	$('.vid').each(function() {
+		$(this).removeClass('select');
+	});
+
+	$videoId = $(this).data('video-id');
+
+	$('#vid_'+$videoId).addClass('select');
+
+	for($i=0; $i<$videos.length; $i++) {
+
+		if($videos[$i].videoId == $videoId) {
+			$('.video-iframe').attr('src', 'https://www.youtube.com/embed/'+$videos[$i].videoId);
+			$('.video-title').text($videos[$i].title);
+			$('.video-desc').html($videos[$i].description.replace(/\n/g,'<br />'));
+		}
+	}
+
+});
+
