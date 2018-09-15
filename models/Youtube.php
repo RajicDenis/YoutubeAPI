@@ -2,7 +2,8 @@
 class Youtube {
 
 	public $videos = [];
-	public $playlist = [];
+	public $channel = [];
+	public $list = [];
 
 	function videosByPlaylistId($data, $part, $params) {
 		$params = array_filter($params);
@@ -57,14 +58,33 @@ class Youtube {
 
 	    if($response['items'] != null) {
 
-	    	array_push($this->playlist, array(
+	    	array_push($this->channel, array(
+	    		'channelId' => $response['items'][0]['id'],
 		    	'id' => $response['items'][0]['contentDetails']['relatedPlaylists']['uploads'],
 		    	'title' => $response['items'][0]['snippet']['title'],
-		    	'description' => $response['items'][0]['snippet']['description'],
+		    	'description' => $response['items'][0]['snippet']['description']
 		    	)
 			);
 
-			return $this->playlist[0];
+			return $this->channel[0];
+
+	    } else {
+
+	    	return false;
+	    }
+
+	}
+
+	function getPlaylists($data, $part, $params) {
+	    $params = array_filter($params);
+	    $response = $data->playlists->listPlaylists(
+	        $part,
+	        $params
+	    );
+
+	    if($response['items'] != null) {
+
+			return $response;
 
 	    } else {
 

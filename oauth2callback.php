@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__.'/vendor/autoload.php';
+require_once __DIR__ . '/config/Config.php';
 
 session_start();
 
@@ -8,7 +9,7 @@ $client->setAuthConfigFile('client_secret.json');
 $client->setRedirectUri(APPROOT.'/oauth2callback');
 $client->addScope(Google_Service_Youtube::YOUTUBE_READONLY);
 $client->setAccessType('offline');
-$client->setApprovalPrompt('consent');
+$client->setApprovalPrompt('force');
 
 if (! isset($_GET['code'])) {
   $auth_url = $client->createAuthUrl();

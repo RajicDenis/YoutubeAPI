@@ -1,7 +1,7 @@
 body {
 	background: #060E15;
 	color: white;
-	font-family: 'Lato', sans-serif;
+	font-family: 'Cantarell', sans-serif;
 	padding-bottom: 100px;
 }
 p {
@@ -24,8 +24,8 @@ input:focus{
 .dark {
 	background: #212F3C;
 }
-.fs19 {
-	font-size: 19px;
+.fs21 {
+	font-size: 21px;
 }
 
 .hide {
@@ -35,6 +35,59 @@ input:focus{
 .show {
 	overflow-y: none;
     max-height: 700px;
+}
+
+.brand {
+    font-weight: 600;
+    font-size: 24px;
+}
+
+/* Playlists */
+.playlist-box {
+	position: relative;
+    height: 350px;
+    padding: 20px 10px;
+    border: 1px solid rgba(255,255,255,0.1);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+.playlist-box:hover {
+	transform: scale(1.03);
+}
+.thumb-img:after {
+	content: '';
+	position: absolute;
+	right: 0;
+	width: 40%;
+	height: 100%;
+	background: rgba(8,8,8,0.8);
+	z-index: 2
+}
+.vid-count {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: absolute;
+	right: 35px;
+	top: calc((100% - 40px) / 2);
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	border: 4px solid white;
+	z-index: 5;
+	font-size: 20px;
+	font-family: 'Lato', sans-serif;
+}
+.play-info {
+	position: absolute;
+	bottom: 10px;
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	padding: 0 20px;
+	font-family: 'Cantarell', sans-serif;
+	font-weight: 600;
 }
 
 #srchChannel {

@@ -11,7 +11,7 @@ $client = new Google_Client();
 $client->setAuthConfig('client_secret.json');
 $client->addScope(Google_Service_Youtube::YOUTUBE_READONLY);
 $client->setAccessType('offline');
-$client->setApprovalPrompt('consent');
+$client->setApprovalPrompt('force');
 
 if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
     $client->setAccessToken($_SESSION['access_token']);
@@ -29,23 +29,31 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
 	}
     
     // Get the channel details
-	$playlist = $youtube->channelsListByUsername($data, 'snippet,contentDetails,statistics', array('forUsername' => $defaultChannel));
+	$channel = $youtube->channelsListByUsername($data, 'snippet,contentDetails,statistics', array('forUsername' => $defaultChannel));
 
-	if($playlist != false) {
-		// Get videos based on the channels playlist id
-		if(isset($_GET['pageToken'])) {
-			$videos = $youtube->videosByPlaylistId($data, 'snippet,contentDetails', array('playlistId' => $playlist['id'], 'maxResults' => 5, 'pageToken' => $_GET['pageToken']));
+	// Get the playlist from the selected channel
+	$playlist = $youtube->getPlaylists($data, 'snippet,contentDetails', array('channelId' => $channel['channelId'], 'maxResults' => 9));
+//echo json_encode($playlist); die();
+
+	if(isset($_GET['playlistId'])) {
+
+		if($channel != false) {
+			// Get videos based on the channels channel id
+			if(isset($_GET['pageToken'])) {
+				$videos = $youtube->videosByPlaylistId($data, 'snippet,contentDetails', array('playlistId' => $_GET['playlistId'], 'maxResults' => 5, 'pageToken' => $_GET['pageToken']));
+			} else {
+				$videos = $youtube->videosByPlaylistId($data, 'snippet,contentDetails', array('playlistId' => $_GET['playlistId'], 'maxResults' => 5));
+			}
+
+			file_put_contents('public/videoData.json', json_encode($videos));
 		} else {
-			$videos = $youtube->videosByPlaylistId($data, 'snippet,contentDetails', array('playlistId' => $playlist['id'], 'maxResults' => 5));
+			// If there is no channel by the entered name, return empty array for videos
+			$videos = [];
 		}
 
-		file_put_contents('public/videoData.json', json_encode($videos));
-	} else {
-		// If there is no channel by the entered name, return empty array for videos
-		$videos = [];
-	}
-	
-	//echo json_encode($videos['pagination']); die();
+	} 
+
+// If user is not authenticated, redirect to authentication page	
 } else {
 
 	$redirect_uri = APPROOT.'/oauth2callback';
@@ -76,7 +84,7 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
 		
 		<nav class="navbar navbar-light dark">
 			<div class="container">
-				<a href="<?php echo APPROOT .'/'; ?>" class="navbar-brand mb-0 h1 text-white">YouTube API</a>
+				<a href="<?php echo APPROOT .'/'; ?>" class="navbar-brand mb-0 h1 text-white brand">YouTube API</a>
 			</div>	
 		</nav>
 
@@ -89,77 +97,91 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
 			</div>
 		</div>
 
-		<?php if($playlist != false): ?>
-
-		<div class="container mt-5">
-
-			<div class="row">
-				<div class="col-7">
-					<div class="d-none"><?php $videos['videos'][0]; ?></div>
-					<iframe class="video-iframe" style="width: 100%; min-height: 400px;" src="https://www.youtube.com/embed/<?php echo $videos['videos'][0]['videoId'] ?>" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-					<span class="fs19 mt-3 video-title"><?php echo $videos['videos'][0]['title']; ?></span>
-					<hr>
-					<p class="text-muted video-desc hide" id="videoDesc"><?php echo nl2br($videos['videos'][0]['description']); ?></p>
-					<hr>
-					<div class="d-flex justify-content-center">
-					<span class="show-more" id="show">SHOW MORE</span>
-					</div>
-				</div>
-
-				<div class="col-5">
-					<div class="container">
-					<?php foreach($videos['videos'] as $video): ?>
-					<div class="row mb-4 thumb-box vid" id="vid_<?php echo $video['videoId']; ?>" data-video-id="<?php echo $video['videoId']; ?>">
-						<div class="col-7">
-							<img style="width: 100%; height: auto;" src="<?php echo $video['thumbnail'] ?>">
-						</div>
-
-						<div class="col-5 d-flex flex-column justify-content-between">
-							<p><strong><?php echo $video['title']; ?></strong></p>
-							<p class="text-muted"><?php echo $video['channelTitle']; ?></p>
-							<p class="text-muted"><?php echo $video['viewCount'].' views'; ?></p>
-						</div>
-					</div>
-					<?php endforeach; ?>
-					
-					<hr>
-					<div class="text-center">
-						<!-- Check if previous page exists -->
-						<?php if($videos['pagination']['prevPage'] != null): ?>
-							<?php if(isset($_GET['channel'])): ?>
-				 				<a href="?channel=<?php echo $_GET['channel']; ?>&pageToken=<?php echo $videos['pagination']['prevPage']; ?>" class="next mr-3"><?php echo '<< PREVIOUS'; ?></a>
-				 			<?php else: ?>
-								<a href="?pageToken=<?php echo $videos['pagination']['prevPage']; ?>" class="next mr-3"><?php echo '<< PREVIOUS'; ?></a>
-				 			<?php endif; ?>
-						<?php endif; ?>
-
-						<!-- Check if next page exists -->
-						<?php if($videos['pagination']['nextPage'] != null): ?>
-							<?php if(isset($_GET['channel'])): ?>
-				 				<a href="?channel=<?php echo $_GET['channel']; ?>&pageToken=<?php echo $videos['pagination']['nextPage']; ?>" class="next ml-3">NEXT>></a>
-				 			<?php else: ?>
-								<a href="?pageToken=<?php echo $videos['pagination']['nextPage']; ?>" class="next ml-3">NEXT>></a>
-				 			<?php endif; ?>
-				 		<?php endif; ?>
-					</div>
-
-					</div>
-
-				</div>
-			</div>
-		</div>
-
+		<!-- If playlist was NOT selected, show playlists -->
+		<?php if(!isset($_GET['playlistId'])): ?>
+			
+			<?php include 'public/include/playlist.php'; ?>
+		
+		<!-- If playlist was selected, show videos -->
 		<?php else: ?>
 
-		<div class="container d-flex flex-column align-items-center position-relative mt-5">
+			<!-- If channel by searched name was found -->
+			<?php if($channel != false): ?>
 
-			<img class="empty-img" src="public/images/empty.png">
+			<div class="container mt-5">
 
-			<hr class="w-100 mt-5">
+				<h2 class="text-center"><?php $channel['title'] ?></h2>
 
-			<h4 class="empty-msg">There is no channel with that name!!</h4>
+				<div class="row">
+					<div class="col-7">
+						<div class="d-none"><?php $videos['videos'][0]; ?></div>
+						<iframe class="video-iframe" style="width: 100%; min-height: 400px;" src="https://www.youtube.com/embed/<?php echo $videos['videos'][0]['videoId'] ?>" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+						<strong><span class="fs21 mt-3 video-title"><?php echo $videos['videos'][0]['title']; ?></span></strong>
+						<hr>
+						<p class="text-muted video-desc hide" id="videoDesc"><?php echo nl2br($videos['videos'][0]['description']); ?></p>
+						<hr>
+						<div class="d-flex justify-content-center">
+						<span class="show-more" id="show">SHOW MORE</span>
+						</div>
+					</div>
 
-		</div>
+					<div class="col-5">
+						<div class="container">
+						<?php foreach($videos['videos'] as $video): ?>
+						<div class="row mb-4 thumb-box vid" id="vid_<?php echo $video['videoId']; ?>" data-video-id="<?php echo $video['videoId']; ?>">
+							<div class="col-7">
+								<img style="width: 100%; height: auto;" src="<?php echo $video['thumbnail'] ?>">
+							</div>
+
+							<div class="col-5 d-flex flex-column justify-content-between">
+								<p><strong><?php echo $video['title']; ?></strong></p>
+								<p class="text-muted"><?php echo $video['channelTitle']; ?></p>
+								<p class="text-muted"><?php echo $video['viewCount'].' views'; ?></p>
+							</div>
+						</div>
+						<?php endforeach; ?>
+						
+						<hr>
+						<div class="text-center">
+							<!-- Check if previous page exists -->
+							<?php if($videos['pagination']['prevPage'] != null): ?>
+								<?php if(isset($_GET['channel'])): ?>
+					 				<a href="?playlistId=<?php echo $_GET['playlistId']; ?>&channel=<?php echo $_GET['channel']; ?>&pageToken=<?php echo $videos['pagination']['prevPage']; ?>" class="next mr-3"><?php echo '<< PREVIOUS'; ?></a>
+					 			<?php else: ?>
+									<a href="?playlistId=<?php echo $_GET['playlistId']; ?>&pageToken=<?php echo $videos['pagination']['prevPage']; ?>" class="next mr-3"><?php echo '<< PREVIOUS'; ?></a>
+					 			<?php endif; ?>
+							<?php endif; ?>
+
+							<!-- Check if next page exists -->
+							<?php if($videos['pagination']['nextPage'] != null): ?>
+								<?php if(isset($_GET['channel'])): ?>
+					 				<a href="?playlistId=<?php echo $_GET['playlistId']; ?>&channel=<?php echo $_GET['channel']; ?>&pageToken=<?php echo $videos['pagination']['nextPage']; ?>" class="next ml-3">NEXT>></a>
+					 			<?php else: ?>
+									<a href="?playlistId=<?php echo $_GET['playlistId']; ?>&pageToken=<?php echo $videos['pagination']['nextPage']; ?>" class="next ml-3">NEXT>></a>
+					 			<?php endif; ?>
+					 		<?php endif; ?>
+						</div>
+
+						</div>
+
+					</div>
+				</div>
+			</div>
+
+			<!-- If channel by searched name was NOT found, display empty message -->
+			<?php else: ?>
+
+			<div class="container d-flex flex-column align-items-center position-relative mt-5">
+
+				<img class="empty-img" src="public/images/empty.png">
+
+				<hr class="w-100 mt-5">
+
+				<h4 class="empty-msg">There is no channel with that name!!</h4>
+
+			</div>
+
+			<?php endif; ?>
 
 		<?php endif; ?>
 
