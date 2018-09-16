@@ -3,23 +3,25 @@
 var showMore = document.getElementById('show');
 var videoDesc = document.getElementById('videoDesc');
 
-showMore.addEventListener('click', function() {
-	if(videoDesc.classList.contains('hide')) {
+if(typeof(showMore) != 'undefined' && showMore != null) {
+	showMore.addEventListener('click', function() {
+		if(videoDesc.classList.contains('hide')) {
 
-		videoDesc.classList.remove('hide');
-		videoDesc.classList.add('show');
-		this.innerHTML = 'SHOW LESS';
+			videoDesc.classList.remove('hide');
+			videoDesc.classList.add('show');
+			this.innerHTML = 'SHOW LESS';
 
-	} else {
+		} else {
 
-		videoDesc.classList.remove('show');
-		videoDesc.classList.add('hide');
-		setTimeout(function() {
-			showMore.innerHTML = 'SHOW MORE';
-		}, 200);
-		
-	}
-});
+			videoDesc.classList.remove('show');
+			videoDesc.classList.add('hide');
+			setTimeout(function() {
+				showMore.innerHTML = 'SHOW MORE';
+			}, 200);
+			
+		}
+	});
+}
 
 $videos = [];
 $.getJSON('public/videoData.json', function(json) {

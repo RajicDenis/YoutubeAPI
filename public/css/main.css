@@ -42,6 +42,10 @@ input:focus{
     font-size: 24px;
 }
 
+.page-btn {
+	font-size: 45px;
+}
+
 /* Playlists */
 .playlist-box {
 	position: relative;

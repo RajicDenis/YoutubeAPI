@@ -5,6 +5,8 @@
 
 	<h2 class="text-center">Playlists</h2>
 
+	<hr>
+
 	<div class="row">
 
 	<?php foreach($playlist['items'] as $list): ?>
@@ -15,6 +17,7 @@
 
 				<form action="<?php echo APPROOT; ?>" method="GET" id="<?php echo 'playlist-form_'. $list['id']; ?>">
 					<input type="hidden" name="playlistId" value="<?php echo $list['id']; ?>">
+					<input type="hidden" name="name" value="<?php echo $list['snippet']['title']; ?>">
 				</form>
 
 				<div class="d-flex justify-content-center position-relative thumb-img">
@@ -39,6 +42,24 @@
 
 	<?php endforeach; ?>
 
+		<hr>
+		<div class="container d-flex justify-content-center mt-5">
+			<div class="row">
+				<!-- Check if previous page exists -->
+				<?php if($playlist['prevPageToken'] != null): ?>
+					
+		 				<a href="?pageToken=<?php echo $playlist['prevPageToken']; ?>" class="next mr-3"><i class="fas fa-chevron-circle-left page-btn"></i></a>
+
+				<?php endif; ?>
+
+				<!-- Check if next page exists -->
+				<?php if($playlist['nextPageToken'] != null): ?>
+					
+		 				<a href="?pageToken=<?php echo $playlist['nextPageToken']; ?>" class="next mr-3"><i class="fas fa-chevron-circle-right page-btn"></i></a>
+
+				<?php endif; ?>
+			</div>
+		</div>
 	</div>
 
 </div>
