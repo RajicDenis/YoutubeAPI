@@ -5,6 +5,7 @@ class Youtube {
 	public $channel = [];
 	public $list = [];
 
+	// Find channel info based on channel name
     function channelsListByUsername($data, $part, $params) {
 	    $params = array_filter($params);
 	    $response = $data->channels->listChannels(
@@ -31,6 +32,7 @@ class Youtube {
 
 	}
 
+	// Get playlist from channel
 	function getPlaylists($data, $part, $params) {
 	    $params = array_filter($params);
 	    $response = $data->playlists->listPlaylists(
@@ -49,6 +51,7 @@ class Youtube {
 
 	}
 
+	// Get all videos from selected playlist
 	function videosByPlaylistId($data, $part, $params) {
 		$params = array_filter($params);
 	    $response = $data->playlistItems->listPlaylistItems(

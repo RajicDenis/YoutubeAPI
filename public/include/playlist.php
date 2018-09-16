@@ -11,7 +11,7 @@
 
 	<?php foreach($playlist['items'] as $list): ?>
 
-		<div class="col-lg-4 col-md-6">
+		<div class="col-lg-4 col-md-6 ctr">
 
 			<div class="playlist-box mt-5" onclick="document.getElementById('playlist-form_<?php echo $list['id']; ?>').submit(); ">
 
@@ -22,7 +22,7 @@
 
 				<div class="d-flex justify-content-center position-relative thumb-img">
 
-					<img src="<?php echo $list['snippet']['thumbnails']['medium']['url']; ?>">
+					<img class="thumbnail-image" src="<?php echo $list['snippet']['thumbnails']['medium']['url']; ?>">
 					<div class="vid-count"><?php echo $list['contentDetails']['itemCount']; ?></div>
 
 				</div>

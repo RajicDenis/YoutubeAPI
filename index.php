@@ -16,6 +16,15 @@ $client->setApprovalPrompt('force');
 if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
     $client->setAccessToken($_SESSION['access_token']);
 
+    // Logout
+    if(isset($_REQUEST['logout'])) {
+    	$client->revokeToken();
+    	unset($_SESSION['access_token']);
+    	session_destroy();
+
+    	header('Location: '. APPROOT);
+    }
+
     // Instantiate Google and Youtube object
     $data = new Google_Service_YouTube($client);
 	$youtube = new Youtube;
@@ -32,13 +41,16 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
 	$channel = $youtube->channelsListByUsername($data, 'snippet,contentDetails,statistics', array('forUsername' => $defaultChannel));
 
 	// Get the playlist from the selected channel
-	if(isset($_GET['pageToken'])) {
-		$playlist = $youtube->getPlaylists($data, 'snippet,contentDetails', array('channelId' => $channel['channelId'], 'maxResults' => 9, 'pageToken' => $_GET['pageToken']));
+	if($channel != false) {
+		if(isset($_GET['pageToken'])) {
+			$playlist = $youtube->getPlaylists($data, 'snippet,contentDetails', array('channelId' => $channel['channelId'], 'maxResults' => 9, 'pageToken' => $_GET['pageToken']));
+		} else {
+			$playlist = $youtube->getPlaylists($data, 'snippet,contentDetails', array('channelId' => $channel['channelId'], 'maxResults' => 9));
+		}
 	} else {
-		$playlist = $youtube->getPlaylists($data, 'snippet,contentDetails', array('channelId' => $channel['channelId'], 'maxResults' => 9));
+		// If there is no channel by the entered name, return empty array for playlist
+		$playlist = [];
 	}
-	
-//echo json_encode($_GET['playlist']); die();
 
 	if(isset($_GET['playlistId'])) {
 
@@ -55,7 +67,7 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
 			// If there is no channel by the entered name, return empty array for videos
 			$videos = [];
 		}
-
+		//echo json_encode($videos); die();
 	} 
 
 // If user is not authenticated, redirect to authentication page	
@@ -83,6 +95,7 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
 	<link href="https://fonts.googleapis.com/css?family=Cantarell:400i" rel="stylesheet">
 
 	<link rel="stylesheet" type="text/css" href="public/css/main.css">
+	<link rel="stylesheet" type="text/css" href="public/css/mobile.css">
 
 	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 </head>
@@ -91,6 +104,10 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
 		<nav class="navbar navbar-light dark">
 			<div class="container">
 				<a href="<?php echo APPROOT .'/'; ?>" class="navbar-brand mb-0 h1 text-white brand">YouTube API</a>
+				<form action="<?php echo APPROOT; ?>" method="GET" id="logout">
+					<input type="hidden" name="logout">
+					<i class="fas fa-power-off logout-btn" onclick="document.getElementById('logout').submit(); "></i>
+				</form>
 			</div>	
 		</nav>
 
@@ -105,18 +122,11 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
 
 		<!-- If playlist was NOT selected, show playlists -->
 		<?php if(!isset($_GET['playlistId'])): ?>
-			
-			<?php include 'public/include/playlist.php'; ?>
-		
-		<!-- If playlist was selected, show videos -->
-		<?php else: ?>
 
-			<!-- If channel by searched name was found -->
 			<?php if($channel != false): ?>
+			
+				<?php include 'public/include/playlist.php'; ?>
 
-				<?php include 'public/include/videos.php'; ?>
-
-			<!-- If channel by searched name was NOT found, display empty message -->
 			<?php else: ?>
 
 				<div class="container d-flex flex-column align-items-center position-relative mt-5">
@@ -130,6 +140,11 @@ if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
 				</div>
 
 			<?php endif; ?>
+		
+		<!-- If playlist was selected, show videos -->
+		<?php else: ?>
+
+			<?php include 'public/include/videos.php'; ?>
 
 		<?php endif; ?>
 

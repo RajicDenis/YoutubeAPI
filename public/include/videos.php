@@ -5,8 +5,8 @@
 
 	<hr class="mb-5">
 
-	<div class="row">
-		<div class="col-7">
+	<div class="row videos-ctr">
+		<div class="col-7 mw75">
 
 			<iframe class="video-iframe" style="width: 100%; min-height: 400px;" src="https://www.youtube.com/embed/<?php echo $videos['videos'][0]['videoId'] ?>" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 			<strong><span class="fs21 mt-3 video-title"><?php echo $videos['videos'][0]['title']; ?></span></strong>
@@ -19,7 +19,7 @@
 
 		</div>
 
-		<div class="col-5">
+		<div class="col-5 mobile-margin">
 			<div class="container">
 				<?php foreach($videos['videos'] as $video): ?>
 				<div class="row mb-4 thumb-box vid" id="vid_<?php echo $video['videoId']; ?>" data-video-id="<?php echo $video['videoId']; ?>">
