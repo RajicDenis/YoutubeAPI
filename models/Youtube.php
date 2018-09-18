@@ -61,11 +61,13 @@ class Youtube {
 
 	    foreach ($response['items'] as $video) {
 
+	    	// Get video statistics
 	    	$vidResult = $data->videos->listVideos('statistics', array(
 		    	'id' => $video['contentDetails']['videoId']
 		    	)
 			);
 
+	    	// Get view count for specific video
 			$vidViewCount = $vidResult['items'][0]['statistics']['viewCount'];
 
 	    	array_push($this->videos, array(
